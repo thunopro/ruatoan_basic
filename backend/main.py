@@ -32,8 +32,6 @@ PUBLIC = ROOT / "public"
 _stats_cache = None  # (data_id, cache_key, stats_result)
 _daily_cache = None  # (data_id, day_ordinal, daily_result)
 
-# In-memory store for password reset tokens: token -> {"email": ..., "expires": ...}
-_reset_tokens = {}
 
 
 @asynccontextmanager
@@ -372,70 +370,6 @@ def change_password(form: PasswordChangeForm, request: Request):
     except Exception:
         logging.exception("change password failed")
         raise HTTPException(503, "Không đổi được mật khẩu. Vui lòng thử lại.")
-    return {"ok": True}
-
-
-class PasswordResetRequestForm(BaseModel):
-    email: EmailStr
-
-
-class PasswordResetForm(BaseModel):
-    token: str
-    new_password: str | None = None
-    password: str | None = None
-
-
-@app.post("/api/request-reset")
-def request_reset(form: PasswordResetRequestForm):
-    import secrets
-    import time
-
-    email = form.email.lower()
-    token = None
-    try:
-        with database.connect() as db:
-            user = db.execute(
-                psycopg.sql.SQL("SELECT id FROM {} WHERE lower(email)=%s").format(database.table("users")),
-                (email,),
-            ).fetchone()
-        if user:
-            token = secrets.token_urlsafe(32)
-            _reset_tokens[token] = {"email": email, "expires": time.time() + 3600}
-    except Exception:
-        logging.exception("request reset failed")
-        raise HTTPException(503, "Không gửi được yêu cầu đặt lại mật khẩu.")
-    return {"ok": True, "token": token}
-
-
-@app.post("/api/reset-password")
-def reset_password(form: PasswordResetForm):
-    import time
-
-    new_password = form.new_password or form.password
-    if not new_password or not (8 <= len(new_password) <= 128):
-        raise HTTPException(400, "Mật khẩu mới phải từ 8 đến 128 ký tự.")
-    info = _reset_tokens.get(form.token)
-    if not info or float(info.get("expires", 0)) < time.time():
-        raise HTTPException(400, "Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.")
-    email = info["email"]
-    try:
-        with database.connect() as db:
-            row = db.execute(
-                psycopg.sql.SQL("SELECT id FROM {} WHERE lower(email)=%s").format(database.table("users")),
-                (email,),
-            ).fetchone()
-            if not row:
-                raise HTTPException(404, "Không tìm thấy tài khoản.")
-            db.execute(
-                psycopg.sql.SQL("UPDATE {} SET password_hash=%s WHERE lower(email)=%s").format(database.table("users")),
-                (auth.hash_password(new_password), email),
-            )
-    except HTTPException:
-        raise
-    except Exception:
-        logging.exception("reset password failed")
-        raise HTTPException(503, "Không đặt lại được mật khẩu. Vui lòng thử lại.")
-    _reset_tokens.pop(form.token, None)
     return {"ok": True}
 
 
