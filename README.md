@@ -4,7 +4,8 @@ Bản học tập viết bằng HTML, CSS, JavaScript thuần và FastAPI. Trang
 
 ## Thư mục
 
-- `public/`: HTML, CSS, JavaScript, hình ảnh và dữ liệu JSON.
+- `public/`: HTML, CSS, JavaScript và hình ảnh tĩnh.
+- `data/`: các file JSON nội dung Toán (bộ đề, lý thuyết, sách, tài liệu).
 - `public/pages/`: các trang luyện tập, đề, lý thuyết, thư viện, đăng nhập, đăng ký và bài làm.
 - `public/js/`: JavaScript của từng trang.
 - `backend/`: API FastAPI, kết nối PostgreSQL và đăng nhập.
@@ -37,7 +38,7 @@ Bản học tập viết bằng HTML, CSS, JavaScript thuần và FastAPI. Trang
 
 ## Đưa lên Vercel
 
-Thêm `DATABASE_URL` và `SESSION_SECRET` trong phần Environment Variables của project Vercel rồi triển khai thư mục này. Ảnh/tài khoản được giữ trong PostgreSQL; thư mục serverless không dùng làm nơi lưu lâu dài. Nội dung JSON trong `public/data` là bộ dữ liệu tĩnh của trang.
+Thêm `DATABASE_URL` và `SESSION_SECRET` trong phần Environment Variables của project Vercel rồi triển khai thư mục này. Ảnh/tài khoản được giữ trong PostgreSQL; thư mục serverless không dùng làm nơi lưu lâu dài. Nội dung JSON trong `data/` là bộ dữ liệu tĩnh của trang.
 
 ## API chính
 
