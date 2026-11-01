@@ -80,6 +80,31 @@ def _all_data_cached(cache_key):
                 copy["problems"].append(problem)
         clean.append(copy)
     clean.sort(key=lambda item: (-(int(item.get("year") or 0)), str(item.get("title", ""))))
+
+    # Build flat problems list and O(1) collection lookup
+    flat_problems = []
+    collections_by_id = {}
+    for item in clean:
+        collections_by_id[item["id"]] = item
+        cid = item.get("id")
+        ctitle = item.get("title", "")
+        cgrade = item.get("grade")
+        cyear = item.get("year")
+        for p in item.get("problems", []):
+            topics = p.get("topics") or []
+            flat_problems.append({
+                "id": p.get("id"),
+                "label": p.get("label", "Bài"),
+                "text": p.get("text", ""),
+                "topics": topics,
+                "topic": topics[0] if topics else "",
+                "collectionId": cid,
+                "collectionTitle": ctitle,
+                "grade": cgrade,
+                "year": cyear,
+                "_search": p.get("_search", ""),
+            })
+
     lessons = []
     for file in sorted((DATA / "theory").glob("*.json")):
         if file.name.startswith("_"):
@@ -92,7 +117,40 @@ def _all_data_cached(cache_key):
             pass
     books = read_array(DATA / "books.json")
     docs = read_array(DATA / "docs.json")
-    return {"collections": clean, "lessons": lessons, "books": books, "docs": docs}
+
+    # Precompute curriculum topic stats
+    alias = {
+        "phuong-trinh": "dai-so", "he-phuong-trinh": "dai-so", "da-thuc": "dai-so",
+        "chia-het": "so-hoc", "so-nguyen-to": "so-hoc", "nghiem-nguyen": "so-hoc",
+        "dong-du": "so-hoc", "tam-giac-dong-dang": "hinh-hoc", "tu-giac-noi-tiep": "hinh-hoc",
+        "duong-tron": "hinh-hoc", "cuc-tri-hinh-hoc": "hinh-hoc",
+        "dirichlet": "to-hop", "nguyen-ly-cuc-han": "to-hop", "roi-rac": "to-hop",
+    }
+    topic_counts = {"so-hoc": 0, "dai-so": 0, "hinh-hoc": 0, "bat-dang-thuc": 0, "to-hop": 0}
+    for p in flat_problems:
+        for t in p["topics"]:
+            k = alias.get(t, t)
+            if k in topic_counts:
+                topic_counts[k] += 1
+
+    stats = {
+        "collections": len(clean),
+        "problems": len(flat_problems),
+        "lessons": len(lessons),
+        "books": len(books),
+        "docs": len(docs),
+        "topics": topic_counts,
+    }
+
+    return {
+        "collections": clean,
+        "collections_by_id": collections_by_id,
+        "problems": flat_problems,
+        "lessons": lessons,
+        "books": books,
+        "docs": docs,
+        "stats": stats,
+    }
 
 
 def read_array(file):

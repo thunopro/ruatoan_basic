@@ -40,6 +40,10 @@ async def lifespan(app):
         database.prepare_database()
     except Exception:
         logging.exception("Database not ready at startup; routes will return 503.")
+    try:
+        content.all_data()
+    except Exception:
+        logging.exception("Failed to warm up content cache.")
     yield
 
 
@@ -158,15 +162,7 @@ def _compute_stats(data):
 
 @app.get("/api/stats")
 def get_stats():
-    global _stats_cache
-    data = content.all_data()
-    cache_key = content._content_cache_key()
-    cached = _stats_cache
-    if cached is not None and cached[0] == id(data) and cached[1] == cache_key:
-        return cached[2]
-    result = _compute_stats(data)
-    _stats_cache = (id(data), cache_key, result)
-    return result
+    return content.all_data()["stats"]
 
 
 @app.get("/api/daily")
@@ -178,20 +174,16 @@ def daily():
     cached = _daily_cache
     if cached is not None and cached[0] == id(data) and cached[1] == today:
         return cached[2]
-    all_problems = []
-    for collection in data["collections"]:
-        for problem in collection.get("problems", []):
-            all_problems.append((problem, collection))
+    all_problems = data["problems"]
     if not all_problems:
         result = {"problem": None, "collection": None}
     else:
         rng = random.Random(today)
-        problem, collection = all_problems[rng.randrange(len(all_problems))]
-        result = {"problem": {"id": problem.get("id"), "label": problem.get("label", "Bài"),
-                              "text": problem.get("text", ""), "topics": problem.get("topics", [])},
-                  "collection": {"id": collection.get("id"), "title": collection.get("title", ""),
-                                 "grade": collection.get("grade"), "year": collection.get("year")}}
-    # Cached once per day; a data reload (new dict id) invalidates it.
+        p = all_problems[rng.randrange(len(all_problems))]
+        result = {"problem": {"id": p.get("id"), "label": p.get("label", "Bài"),
+                              "text": p.get("text", ""), "topics": p.get("topics", [])},
+                  "collection": {"id": p.get("collectionId"), "title": p.get("collectionTitle", ""),
+                                 "grade": p.get("grade"), "year": p.get("year")}}
     _daily_cache = (id(data), today, result)
     return result
 
@@ -220,41 +212,36 @@ def get_collections(search: str = "", grade: int = 0, kind: str = "", page: int 
 
 @app.get("/api/problems")
 def get_problems(search: str = "", grade: int = 0, topic: str = "", page: int = 1, limit: int = 20):
-    """Find individual questions across all collections."""
-    words = content.fold_text(search).split()
-    matches = []
-    for collection in content.all_data()["collections"]:
-        if grade and int(collection.get("grade") or 0) != grade:
-            continue
-        for problem in collection.get("problems", []):
-            topics = problem.get("topics") or []
-            if topic and topic not in topics:
-                continue
-            text = problem.get("_search", "")
-            if all(word in text for word in words):
-                matches.append({"id": problem.get("id"), "label": problem.get("label", "Bài"),
-                                "text": problem.get("text", ""), "topics": topics,
-                                "collectionId": collection.get("id"), "collectionTitle": collection.get("title", ""),
-                                "grade": collection.get("grade"), "year": collection.get("year")})
+    """Find individual questions across all collections with instant flat lookup."""
+    items = content.all_data()["problems"]
+    if grade:
+        items = [p for p in items if p.get("grade") == grade]
+    if topic:
+        items = [p for p in items if topic in p.get("topics", [])]
+    if search:
+        words = content.fold_text(search).split()
+        if words:
+            items = [p for p in items if all(w in p["_search"] for w in words)]
+    total = len(items)
     limit = min(max(limit, 1), 50)
     page = max(page, 1)
     start = (page - 1) * limit
-    return {"total": len(matches), "page": page, "items": matches[start:start + limit]}
+    return {"total": total, "page": page, "items": items[start:start + limit]}
 
 
 @app.get("/api/collections/{collection_id}")
 def get_collection(collection_id: str, page: int = 1, per: int = 20):
-    for item in content.all_data()["collections"]:
-        if item.get("id") == collection_id:
-            problems = item.get("problems", [])
-            per = min(max(per, 1), 50)
-            page = max(page, 1)
-            start = (page - 1) * per
-            cleaned = [{k: v for k, v in p.items() if k != "_search"} for p in problems[start:start + per]]
-            return {"id": item.get("id"), "title": item.get("title", ""), "grade": item.get("grade"),
-                    "year": item.get("year"), "kind": item.get("kind"), "province": item.get("province"),
-                    "total": len(problems), "page": page, "per": per, "items": cleaned, "problems": cleaned}
-    raise HTTPException(404, "Không tìm thấy đề hoặc bộ bài tập.")
+    item = content.all_data()["collections_by_id"].get(collection_id)
+    if not item:
+        raise HTTPException(404, "Không tìm thấy đề hoặc bộ bài tập.")
+    problems = item.get("problems", [])
+    per = min(max(per, 1), 50)
+    page = max(page, 1)
+    start = (page - 1) * per
+    cleaned = [{k: v for k, v in p.items() if k != "_search"} for p in problems[start:start + per]]
+    return {"id": item.get("id"), "title": item.get("title", ""), "grade": item.get("grade"),
+            "year": item.get("year"), "kind": item.get("kind"), "province": item.get("province"),
+            "total": len(problems), "page": page, "per": per, "items": cleaned, "problems": cleaned}
 
 
 @app.get("/api/lessons")

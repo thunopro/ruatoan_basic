@@ -10,12 +10,14 @@ function showLessons() {
   const matches = lessons.filter(x => ((x.title || '') + ' ' + (x.summary || '')).toLocaleLowerCase('vi').includes(term));
   // Tiêu đề là nút bấm toggle (thay cho anchor href="#" không hoạt động).
   place.innerHTML = matches.map((lesson, index) => `
-    <article class="ccard">
-      <div class="ccard-head"><span class="ccard-meta">${escapeText(lesson.topic || '')}</span></div>
-      <h3><button class="button secondary lesson-toggle" type="button" data-index="${index}">${escapeText(lesson.title)}</button></h3>
-      <p class="muted small">${escapeText(lesson.summary || '')}</p>
-      <button class="button secondary" data-index="${index}">Đọc bài</button>
-      <div id="lesson-${index}" hidden class="lesson-body md"></div>
+    <article class="lcard" style="--t:#b6ff3b">
+      <div class="lcard-no">CHUYÊN ĐỀ #${index + 1} · ${escapeText(lesson.topic || 'Toán THCS')}</div>
+      <h3>${escapeText(lesson.title)}</h3>
+      <p>${escapeText(lesson.summary || '')}</p>
+      <div class="row">
+        <button class="btn sm secondary lesson-toggle" type="button" data-index="${index}">📖 Xem nội dung chuyên đề</button>
+      </div>
+      <div id="lesson-${index}" hidden class="lesson-body md scroll" style="margin-top:14px;background:#fff8e6;color:#1f1a10;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);border-radius:10px;padding:16px"></div>
     </article>`).join('') || '<p class="empty">Chưa có kết quả.</p>';
   place.querySelectorAll('button').forEach(button => {
     button.onclick = () => {

@@ -43,7 +43,7 @@ async function loadProblems(reset = false) {
         <div class="pcard-foot">
           <span class="chips"><span class="chip"><b>${escapeText(problem.topic || '')}</b></span></span>
           <span class="pcard-src"><a href="/pages/exams.html?id=${encodeURIComponent(problem.collectionId)}">${escapeText(problem.collectionTitle)} · ${escapeText(problem.year || '')}</a></span>
-          <button class="button secondary save" data-id="${escapeText(problem.id)}" data-collection="${escapeText(problem.collectionId)}" data-title="${escapeText(problem.collectionTitle)}" data-label="${escapeText(problem.label)}">${marked ? '✓ Đã đánh dấu' : 'Đánh dấu'}</button>
+          <button class="btn sm secondary save" data-id="${escapeText(problem.id)}" data-collection="${escapeText(problem.collectionId)}" data-title="${escapeText(problem.collectionTitle)}" data-label="${escapeText(problem.label)}">${marked ? '✓ Đã đánh dấu' : 'Đánh dấu'}</button>
         </div>
       </article>`;
     }).join(''));

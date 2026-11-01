@@ -65,15 +65,21 @@ async function showCollection() {
     const place = document.getElementById('results');
     const problems = c.problems || [];
     place.innerHTML = problems.map((p, i) => `
-      <article class="row" style="margin:12px 0">
-        <b>${escapeText(p.label || ('Bài ' + (i + 1)))}</b>
-        <p class="question-text">${escapeText(p.text)}</p>
-        <div class="row" style="padding:8px 0">
-          <button class="button secondary save" data-index="${i}">Đánh dấu</button>
-          <button class="button secondary photo-btn" data-problem="${escapeText(p.id)}" data-label="${escapeText(p.label || ('Bài ' + (i + 1)))}" data-title="${escapeText(c.title)}" type="button">📷 Nộp ảnh</button>
-          <input type="file" class="photo-input" data-problem="${escapeText(p.id)}" accept="image/jpeg,image/png,image/webp" multiple hidden>
+      <article class="pcard" style="margin:20px 0">
+        <div class="pcard-top">
+          <span class="plabel">${escapeText(p.label || ('Bài ' + (i + 1)))}</span>
         </div>
-        <div class="photo-grid problem-photos" data-problem="${escapeText(p.id)}"></div>
+        <div class="md pcard-text" style="padding:12px 0">
+          <p class="question-text" style="color:#1f1a10;margin:0">${escapeText(p.text)}</p>
+        </div>
+        <div class="pcard-foot">
+          <div class="row">
+            <button class="btn sm secondary save" data-index="${i}">Đánh dấu</button>
+            <button class="btn sm secondary photo-btn" data-problem="${escapeText(p.id)}" data-label="${escapeText(p.label || ('Bài ' + (i + 1)))}" data-title="${escapeText(c.title)}" type="button">📷 Nộp ảnh bài làm</button>
+            <input type="file" class="photo-input" data-problem="${escapeText(p.id)}" accept="image/jpeg,image/png,image/webp" multiple hidden>
+          </div>
+          <div class="photo-grid problem-photos" data-problem="${escapeText(p.id)}"></div>
+        </div>
       </article>`).join('');
     place.querySelectorAll('.save').forEach(button => {
       button.onclick = () => saveProblem(c, problems[Number(button.dataset.index)]);
@@ -135,7 +141,7 @@ async function loadProblemPhotos(problemId, root) {
       <article class="photo">
         <img src="/api/photos/${encodeURIComponent(item.id)}" alt="Ảnh bài làm" loading="lazy">
         <p>${escapeText(item.file_name)}</p>
-        <button class="button secondary" data-id="${escapeText(String(item.id))}" type="button">Xóa</button>
+        <button class="btn sm secondary" data-id="${escapeText(String(item.id))}" type="button">Xóa</button>
       </article>`).join('');
     grid.querySelectorAll('button').forEach(btn => {
       btn.onclick = async () => {

@@ -19,5 +19,4 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 }
 
 /* === readability overrides (basic version) === */
-.row { background: #fff8e7 !important; color: #1f1a10 !important; }
-.question-text { color: #1f1a10 !important; }
+.question-text { color: #1f1a10; }
