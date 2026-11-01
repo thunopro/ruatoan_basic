@@ -8,6 +8,11 @@ const MAX_SIZE = 1.5 * 1024 * 1024; // 1.5MB
 
 // ===================== Danh sách ảnh đã tải lên =====================
 async function loadPhotos() {
+  // Kiểm tra đăng nhập trước để tránh 401 console noise cho khách.
+  try {
+    const me = await api('/api/me');
+    if (!me || !me.user) { location.href = '/pages/login.html'; return; }
+  } catch (e) { location.href = '/pages/login.html'; return; }
   try {
     const data = await api('/api/photos');
     const items = data.items || [];
