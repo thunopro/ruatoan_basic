@@ -1,0 +1,32 @@
+# secrets
+.env.local
+.env
+*.env
+
+# python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# vercel
+.vercel/
+
+# build/cache
+*.log
+*.xdv
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.toc
+*.lof
+*.lot
+
+# large downloaded artifacts
+*.whl
+
+# os
+.DS_Store

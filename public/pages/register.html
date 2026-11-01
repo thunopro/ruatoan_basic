@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Tạo tài khoản Rùa Toán miễn phí để luyện tập và lưu bài làm.">
+  <title>Đăng ký · Rùa Toán</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231d4ed8'/%3E%3Ctext x='32' y='46' font-size='40' text-anchor='middle' fill='white' font-family='serif'%3E∑%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/original.css">
+  <script defer src="/js/common.js"></script>
+  <script defer src="/js/account.js"></script>
+</head>
+<body>
+  <header id="site-header"></header>
+  <main class="container narrow">
+    <h1>Tạo tài khoản</h1>
+    <form id="account-form" class="form">
+      <label>Tên hiển thị<input type="text" name="name" required></label>
+      <label>Email<input type="email" name="email" required></label>
+      <label>Mật khẩu (ít nhất 8 ký tự)<input type="password" name="password" minlength="8" required></label>
+      <button class="button">Đăng ký</button>
+      <p id="message"></p>
+    </form>
+    <p>Đã có tài khoản? <a href="/pages/login.html">Đăng nhập</a></p>
+  </main>
+  <footer>Rùa Toán Basic</footer>
+</body>
+</html>
