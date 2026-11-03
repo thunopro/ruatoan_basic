@@ -2,8 +2,10 @@
 
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
-let page = params.get('page') ? Number(params.get('page')) : 1;
-let kindFilter = params.get('kind') || '';
+const requestedPage = Number(params.get('page') || 1);
+let page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+const requestedKind = params.get('kind') || '';
+let kindFilter = ['hsg', 'chuyen', 'tapchi', 'chuyende', 'olympic'].includes(requestedKind) ? requestedKind : '';
 let loadingMore = false;
 
 const STAMP = { hsg: 'stamp-hsg', chuyen: 'stamp-chuyen', tapchi: 'stamp-tapchi', chuyende: 'stamp-chuyende', olympic: 'stamp-olympic' };
@@ -25,6 +27,10 @@ async function listCollections() {
     const total = data.total || 0;
     const perPage = 24;
     const totalPages = Math.max(1, Math.ceil(total / perPage));
+    if (page > totalPages) {
+      page = totalPages;
+      return listCollections();
+    }
     if (countEl) countEl.innerHTML = `<b>${total.toLocaleString('vi-VN')}</b> đề · trang ${page}/${totalPages}`;
     place.innerHTML = items.map(c => `
       <a class="ccard" href="/pages/exams.html?id=${encodeURIComponent(c.id)}&page=${page}">

@@ -353,3 +353,184 @@ textarea:focus-visible { outline: 3px solid var(--ooze); outline-offset: 3px; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: .01ms !important; }
 }
+
+/* Rùa Toán visual refresh: fresh paper, forest green, and a softer lime. */
+:root {
+  --brand: #176447;
+  --brand-2: #2c805d;
+  --brand-ink: #123d2c;
+  --panel: #ffffff;
+  --panel-2: #f4f8f4;
+  --ink: #dbe6dc;
+  --bg: #f5f8f4;
+  --bg-2: #ecf3ed;
+  --text: #1b3529;
+  --muted: #6c7d72;
+  --border: #dbe6dc;
+  --ooze: #c5ef79;
+  --paper: #fffdf6;
+  --paper-ink: #24372b;
+  --shadow: 0 14px 34px rgba(27, 65, 46, .09);
+  --r: 18px;
+}
+body {
+  color: var(--text);
+  background: radial-gradient(ellipse at 8% 0, #e1f2db 0, transparent 30%),
+              radial-gradient(ellipse at 100% 28%, #e5f0e8 0, transparent 26%),
+              var(--bg);
+}
+main { padding-top: 34px; }
+#site-header .top {
+  background: rgba(255, 255, 255, .94);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(25, 62, 44, .06);
+  backdrop-filter: blur(14px);
+}
+#site-header .top:before { display: none; }
+#site-header .ooze-drip { display: none; }
+.top-in { min-height: 72px; gap: 22px; }
+.brand { gap: 10px; }
+.brand-art { width: 44px; height: 44px; filter: drop-shadow(0 3px 4px #184b3918); }
+.brand-name {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  column-gap: 4px;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.04em;
+  line-height: 1;
+  text-shadow: none;
+}
+.brand-name b { color: var(--brand); font-weight: 900; }
+.brand-name small {
+  grid-column: 1 / -1;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .15em;
+}
+.nav { gap: 4px; }
+.nav a { padding: 9px 12px; color: #53685b; font-size: 13px; font-weight: 700; }
+.nav a:hover, .nav a.on { color: var(--brand); background: #edf6ed; border-color: transparent; box-shadow: none; }
+#account-link { gap: 8px; }
+.btn, .button, .btn.primary, .button.primary, a.btn.primary {
+  color: #fff;
+  background: var(--brand);
+  border: 1px solid var(--brand);
+  border-radius: 12px;
+  box-shadow: 0 5px 12px rgba(23, 100, 71, .15);
+  font-family: var(--font-main, system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 750;
+}
+.btn:hover, .button:hover, .btn.primary:hover, .button.primary:hover {
+  color: #fff;
+  background: #0f5138;
+  box-shadow: 0 8px 18px rgba(23, 100, 71, .2);
+}
+.btn.ghost, .button.ghost, .btn.secondary, .button.secondary {
+  color: var(--brand);
+  background: #fff;
+  border-color: var(--border);
+  box-shadow: 0 3px 9px rgba(27, 65, 46, .05);
+}
+.btn.ghost:hover, .btn.secondary:hover, .button.secondary:hover { color: var(--brand); background: #f1f8ef; border-color: #bdd5c2; }
+.btn.big, .button.big { border-radius: 14px; }
+.hero {
+  min-height: 350px;
+  border: 1px solid #d9e7d9;
+  border-radius: 30px;
+  box-shadow: 0 22px 54px rgba(32, 76, 51, .12);
+  background: radial-gradient(circle at 82% 50%, #d7efbd 0, transparent 32%),
+              linear-gradient(125deg, #f1f8ed 0%, #fbfcf5 56%, #e8f2e7 100%);
+}
+.hero:after { opacity: .3; }
+.logo-big {
+  color: var(--brand-ink);
+  font-size: clamp(42px, 7.5vw, 76px);
+  letter-spacing: -.055em;
+  text-shadow: none;
+  transform: none;
+}
+.logo-big span { color: var(--brand); text-shadow: none; }
+.kicker { color: var(--brand); font-weight: 800; letter-spacing: .13em; }
+.lead { color: #5d7063; }
+.hero-art { filter: drop-shadow(0 18px 16px #1f513425); }
+.stats { margin-top: 24px; gap: 14px; }
+.stat, .stat:nth-child(odd), .stat:nth-child(even) {
+  min-height: 106px;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(29, 65, 46, .06);
+  transform: none;
+}
+.stat b { color: var(--brand); text-shadow: none; }
+.stat span { color: var(--muted); }
+.mission {
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  background: #fff;
+}
+.mission-side { border-right: 1px solid #d6e3db; }
+.mission-main .plabel { color: var(--text); text-shadow: none; }
+.sec { color: var(--text); text-shadow: none; }
+.sec:before { width: 10px; height: 10px; border: 0; box-shadow: 0 0 0 5px #e7f3df; }
+.topic, .ccard, .pcard, .lcard, .book, .doc, .form, .auth-card {
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(29, 65, 46, .06);
+}
+.topic:hover, .ccard:hover, .pcard:hover, .lcard:hover, .book:hover, .doc:hover {
+  color: var(--text);
+  border-color: #bfd5c3;
+  box-shadow: 0 14px 30px rgba(29, 65, 46, .1);
+  transform: translateY(-3px);
+}
+.ccard:nth-child(3n+1), .ccard:nth-child(3n+2) { transform: none; }
+.ccard:before { display: none; }
+.ccard-meta, .muted { color: var(--muted); }
+.pcard-text, .scroll { background: #fffdf7; border-color: #e8e6d9; }
+.question-text { color: #25382c; }
+.plabel { color: var(--brand); }
+.stamp { border-radius: 7px; box-shadow: none; }
+.form { padding: clamp(20px, 4vw, 30px); }
+input, select, textarea {
+  color: var(--text) !important;
+  background: #fbfdfb !important;
+  border: 1px solid #ccdacf !important;
+  border-radius: 11px !important;
+  box-shadow: inset 0 1px 2px rgba(27, 65, 46, .03);
+}
+input::placeholder, textarea::placeholder { color: #829087; }
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid #bde5a8 !important;
+  outline-offset: 1px;
+  border-color: var(--brand) !important;
+}
+.auth-page { margin-top: 42px; }
+.auth-card { box-shadow: 0 18px 44px rgba(29, 65, 46, .1); }
+.auth-card h1 { color: var(--text); text-shadow: none; }
+.phead h1 { color: var(--text); text-shadow: none; }
+.foot { color: var(--muted); background: #edf3ed; border-top: 1px solid var(--border); }
+.foot p { margin: 0; }
+.empty { color: var(--muted); background: #fff; border-color: var(--border); }
+@media (max-width: 760px) {
+  .top-in { min-height: 64px; gap: 4px 10px; }
+  .nav { padding-top: 5px; }
+  .hero { min-height: 310px; }
+}
+@media (max-width: 480px) {
+  main { padding: 24px 14px 54px; }
+  .brand-art { width: 40px; height: 40px; }
+  .hero { border-radius: 22px; }
+  .stats { gap: 10px; }
+  .stat, .stat:nth-child(odd), .stat:nth-child(even) { min-height: 88px; padding: 12px; }
+}

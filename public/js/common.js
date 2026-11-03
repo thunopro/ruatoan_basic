@@ -7,8 +7,19 @@ if (nav) {
 <header class="top">
   <div class="top-in">
     <a class="brand" aria-label="Rùa Toán — trang chủ" href="/">
-      <svg viewBox="0 0 200 210" width="40" height="42" class="brand-art" aria-hidden="true"><ellipse cx="100" cy="201" rx="64" ry="8" fill="rgba(0,0,0,.35)"></ellipse><path d="M150 64C170 48 190 52 199 66C185 67 172 72 157 82Z" fill="#2f8cff" stroke="#0d1a0f" stroke-width="4" stroke-linejoin="round"></path><ellipse cx="100" cy="72" rx="60" ry="52" fill="#5cc85a"></ellipse><g><circle cx="81" cy="75" r="6.5" fill="#0d1a0f"></circle><circle cx="119" cy="75" r="6.5" fill="#0d1a0f"></circle></g><ellipse cx="100" cy="72" rx="60" ry="52" fill="none" stroke="#0d1a0f" stroke-width="5"></ellipse></svg>
-      <span class="brand-name">Rùa <b>Toán</b></span>
+      <svg viewBox="0 0 64 64" class="brand-art" aria-hidden="true">
+        <g fill="#77b78c" stroke="#184b39" stroke-width="2.5">
+          <ellipse cx="17" cy="24" rx="6" ry="4.5" transform="rotate(-35 17 24)" />
+          <ellipse cx="17" cy="45" rx="6" ry="4.5" transform="rotate(35 17 45)" />
+          <ellipse cx="43" cy="24" rx="6" ry="4.5" transform="rotate(35 43 24)" />
+          <ellipse cx="43" cy="45" rx="6" ry="4.5" transform="rotate(-35 43 45)" />
+          <ellipse cx="30" cy="35" rx="19" ry="15" fill="#c5ef79" />
+          <circle cx="50" cy="31" r="9" fill="#77b78c" />
+        </g>
+        <path d="M13 34h34M30 20v29M18 27l12 8 13-8M18 43l12-8 13 8" fill="none" stroke="#4c8f67" stroke-width="2" stroke-linecap="round" />
+        <circle cx="52" cy="29" r="1.4" fill="#173b2e" />
+      </svg>
+      <span class="brand-name"><span>Rùa</span><b>Toán</b><small>HỌC TOÁN THCS</small></span>
     </a>
     <nav class="nav" aria-label="Điều hướng chính">
       <a href="/pages/practice.html">Luyện bài</a>
