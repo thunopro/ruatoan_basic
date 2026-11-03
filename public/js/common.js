@@ -63,6 +63,33 @@ function wireLogout(logout) {
 
 // ===================== Helpers chung =====================
 
+const TOPIC_CATEGORIES = {
+  'phuong-trinh': 'dai-so', 'he-phuong-trinh': 'dai-so', 'da-thuc': 'dai-so',
+  'nghiem-nguyen': 'so-hoc', 'chia-het': 'so-hoc', 'so-nguyen-to': 'so-hoc', 'dong-du': 'so-hoc',
+  'tam-giac-dong-dang': 'hinh-hoc', 'tu-giac-noi-tiep': 'hinh-hoc',
+  'duong-tron': 'hinh-hoc', 'cuc-tri-hinh-hoc': 'hinh-hoc',
+  dirichlet: 'to-hop', 'nguyen-ly-cuc-han': 'to-hop', 'roi-rac': 'to-hop'
+};
+const TOPIC_LABELS = {
+  'so-hoc': 'Số học', 'dai-so': 'Đại số', 'bat-dang-thuc': 'Bất đẳng thức',
+  'hinh-hoc': 'Hình học', 'to-hop': 'Tổ hợp',
+  'phuong-trinh': 'Phương trình', 'he-phuong-trinh': 'Hệ phương trình', 'da-thuc': 'Đa thức',
+  'nghiem-nguyen': 'Nghiệm nguyên', 'chia-het': 'Chia hết', 'so-nguyen-to': 'Số nguyên tố', 'dong-du': 'Đồng dư',
+  'tam-giac-dong-dang': 'Tam giác đồng dạng', 'tu-giac-noi-tiep': 'Tứ giác nội tiếp',
+  'duong-tron': 'Đường tròn', 'cuc-tri-hinh-hoc': 'Cực trị hình học',
+  dirichlet: 'Nguyên lý Dirichlet', 'nguyen-ly-cuc-han': 'Nguyên lý cực hạn', 'roi-rac': 'Toán rời rạc'
+};
+
+function canonicalTopic(topic) {
+  const key = String(topic || '');
+  return TOPIC_CATEGORIES[key] || key;
+}
+
+function topicLabel(topic) {
+  const key = String(topic || '');
+  return TOPIC_LABELS[key] || key.replaceAll('-', ' ');
+}
+
 // escapeText: mọi dữ liệu từ API chèn vào HTML đều phải đi qua hàm này.
 function escapeText(text) {
   const box = document.createElement('span');

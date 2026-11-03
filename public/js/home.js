@@ -20,7 +20,7 @@ async function loadStats() {
   try {
     const stats = await api('/api/stats');
     const statEls = document.querySelectorAll('#stats .stat');
-    const values = [stats.problems, stats.collections, stats.docs, stats.books];
+    const values = [stats.problems, stats.collections, stats.lessons, stats.books];
     statEls.forEach((el, i) => {
       const b = el.querySelector('b');
       if (b) b.textContent = Number(values[i] || 0).toLocaleString('vi-VN');
@@ -59,11 +59,12 @@ async function loadDaily() {
     if (sourceEl) sourceEl.textContent = c.title ? (c.title + (c.grade ? ' · Lớp ' + c.grade : '') + (c.year ? ' · ' + c.year : '')) : '';
     if (linkEl && c.id) linkEl.href = '/pages/exams.html?id=' + encodeURIComponent(c.id);
     const topicKey = (p.topics && p.topics[0]) || 'hinh-hoc';
-    const tm = TOPIC_META.find(t => t.key === topicKey) || TOPIC_META[3];
+    const categoryKey = canonicalTopic(topicKey);
+    const tm = TOPIC_META.find(t => t.key === categoryKey) || TOPIC_META[3];
     if (topicEl) topicEl.style.setProperty('--c', tm.color);
     if (topicEl) topicEl.style.setProperty('--ci', tm.ti);
     if (topicNameEl) topicNameEl.textContent = tm.name;
-    if (topicEl) topicEl.href = '/pages/practice.html?topic=' + encodeURIComponent(topicKey);
+    if (topicEl) topicEl.href = '/pages/practice.html?topic=' + encodeURIComponent(categoryKey);
     renderMath();
   } catch (error) {
     if (textEl) textEl.textContent = error.message;

@@ -10,7 +10,7 @@ const STAMP = { hsg: 'stamp-hsg', chuyen: 'stamp-chuyen', tapchi: 'stamp-tapchi'
 
 function stampClass(kind) { return STAMP[kind] || 'stamp-hsg'; }
 function stampLabel(kind) {
-  return ({ hsg: 'HSG', chuyen: 'VÀO 10', tapchi: 'TAPCHI', chuyende: 'CHUYEN DE', olympic: 'OLYMPIC' })[kind] || (kind || 'ĐỀ').toUpperCase();
+  return ({ hsg: 'HSG', chuyen: 'VÀO 10', tapchi: 'TẠP CHÍ', chuyende: 'CHUYÊN ĐỀ', olympic: 'OLYMPIC' })[kind] || (kind || 'ĐỀ').toUpperCase();
 }
 
 // ===================== Danh sách bộ đề =====================
@@ -30,7 +30,7 @@ async function listCollections() {
       <a class="ccard" href="/pages/exams.html?id=${encodeURIComponent(c.id)}&page=${page}">
         <div class="ccard-head"><span class="stamp ${stampClass(c.kind)}">${escapeText(stampLabel(c.kind))}</span><span class="ccard-meta">Lớp ${escapeText(c.grade || '?')} · ${escapeText(c.year || '')}</span></div>
         <h3>${escapeText(c.title)}</h3>
-        <p class="muted small">${escapeText(c.itemSummary || '')} bài</p>
+        <p class="muted small">${escapeText(c.itemSummary || '')}</p>
       </a>`).join('') || '<p class="muted">Không có đề.</p>';
 
     // pager
