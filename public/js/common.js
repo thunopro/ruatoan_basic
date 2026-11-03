@@ -8,18 +8,13 @@ if (nav) {
   <div class="top-in">
     <a class="brand" aria-label="Rùa Toán — trang chủ" href="/">
       <svg viewBox="0 0 64 64" class="brand-art" aria-hidden="true">
-        <g fill="#77b78c" stroke="#184b39" stroke-width="2.5">
-          <ellipse cx="17" cy="24" rx="6" ry="4.5" transform="rotate(-35 17 24)" />
-          <ellipse cx="17" cy="45" rx="6" ry="4.5" transform="rotate(35 17 45)" />
-          <ellipse cx="43" cy="24" rx="6" ry="4.5" transform="rotate(35 43 24)" />
-          <ellipse cx="43" cy="45" rx="6" ry="4.5" transform="rotate(-35 43 45)" />
-          <ellipse cx="30" cy="35" rx="19" ry="15" fill="#c5ef79" />
-          <circle cx="50" cy="31" r="9" fill="#77b78c" />
-        </g>
-        <path d="M13 34h34M30 20v29M18 27l12 8 13-8M18 43l12-8 13 8" fill="none" stroke="#4c8f67" stroke-width="2" stroke-linecap="round" />
-        <circle cx="52" cy="29" r="1.4" fill="#173b2e" />
+        <circle cx="32" cy="32" r="30" fill="#0d1a0f" />
+        <ellipse cx="32" cy="33" rx="25" ry="23" fill="#7b5a2c" stroke="#b6ff3b" stroke-width="3" />
+        <path d="M32 17l9 5v10l-9 5-9-5V22z" fill="#5cc85a" stroke="#0d1a0f" stroke-width="2.5" />
+        <path d="M32 37v9M23 32l-9 5M41 32l9 5M23 22l-8-5M41 22l8-5M32 17v-5" stroke="#0d1a0f" stroke-width="2.5" />
+        <path d="M8 27h48v8H8z" fill="#2f8cff" stroke="#0d1a0f" stroke-width="2.5" />
       </svg>
-      <span class="brand-name"><span>Rùa</span><b>Toán</b><small>HỌC TOÁN THCS</small></span>
+      <span class="brand-name">Rùa <b>Toán</b></span>
     </a>
     <nav class="nav" aria-label="Điều hướng chính">
       <a href="/pages/practice.html">Luyện bài</a>
@@ -100,6 +95,7 @@ function topicLabel(topic) {
   const key = String(topic || '');
   return TOPIC_LABELS[key] || key.replaceAll('-', ' ');
 }
+window.topicLabel = topicLabel;
 
 // escapeText: mọi dữ liệu từ API chèn vào HTML đều phải đi qua hàm này.
 function escapeText(text) {

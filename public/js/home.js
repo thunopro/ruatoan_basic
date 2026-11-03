@@ -20,7 +20,7 @@ async function loadStats() {
   try {
     const stats = await api('/api/stats');
     const statEls = document.querySelectorAll('#stats .stat');
-    const values = [stats.problems, stats.collections, stats.lessons, stats.books];
+    const values = [stats.problems, stats.collections, stats.docs, stats.books];
     statEls.forEach((el, i) => {
       const b = el.querySelector('b');
       if (b) b.textContent = Number(values[i] || 0).toLocaleString('vi-VN');
@@ -43,8 +43,7 @@ async function loadStats() {
 async function loadDaily() {
   const dateEl = document.getElementById('daily-date');
   const labelEl = document.getElementById('daily-label');
-  const topicEl = document.getElementById('daily-topic');
-  const topicNameEl = document.getElementById('daily-topic-name');
+  const topicsEl = document.getElementById('daily-topics');
   const textEl = document.getElementById('daily-text');
   const sourceEl = document.getElementById('daily-source');
   const linkEl = document.getElementById('daily-link');
@@ -58,13 +57,14 @@ async function loadDaily() {
     if (textEl) textEl.textContent = p.text || '';
     if (sourceEl) sourceEl.textContent = c.title ? (c.title + (c.grade ? ' · Lớp ' + c.grade : '') + (c.year ? ' · ' + c.year : '')) : '';
     if (linkEl && c.id) linkEl.href = '/pages/exams.html?id=' + encodeURIComponent(c.id);
-    const topicKey = (p.topics && p.topics[0]) || 'hinh-hoc';
-    const categoryKey = canonicalTopic(topicKey);
-    const tm = TOPIC_META.find(t => t.key === categoryKey) || TOPIC_META[3];
-    if (topicEl) topicEl.style.setProperty('--c', tm.color);
-    if (topicEl) topicEl.style.setProperty('--ci', tm.ti);
-    if (topicNameEl) topicNameEl.textContent = tm.name;
-    if (topicEl) topicEl.href = '/pages/practice.html?topic=' + encodeURIComponent(categoryKey);
+    const categoryKeys = [...new Set((p.topics || []).map(canonicalTopic))];
+    const topicTags = categoryKeys.map(key => TOPIC_META.find(t => t.key === key)).filter(Boolean);
+    if (topicsEl && topicTags.length) {
+      topicsEl.innerHTML = topicTags.map(topic => `
+        <a class="chip" style="--c:${topic.color};--ci:${topic.ti}" href="/pages/practice.html?topic=${encodeURIComponent(topic.key)}">
+          <b aria-hidden="true">${escapeText(topic.icon)}</b><span>${escapeText(topic.name)}</span>
+        </a>`).join('');
+    }
     renderMath();
   } catch (error) {
     if (textEl) textEl.textContent = error.message;
