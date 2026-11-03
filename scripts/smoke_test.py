@@ -22,6 +22,8 @@ BASE = f"http://127.0.0.1:{PORT}"
 
 def main():
     env = dict(os.environ)
+    # The reset-token flow is testable locally without an email provider.
+    env["PASSWORD_RESET_DEBUG"] = "1"
     # Load .env.local if present
     env_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env.local")
     if os.path.exists(env_file):
@@ -37,8 +39,8 @@ def main():
                 env[k.strip()] = v
 
     proc = subprocess.Popen(
-        [os.path.join(os.path.dirname(os.path.dirname(__file__)), ".venv", "bin", "uvicorn"),
-         "backend.main:app", "--host", "127.0.0.1", "--port", str(PORT)],
+        [sys.executable, "-m", "uvicorn", "backend.main:app",
+         "--host", "127.0.0.1", "--port", str(PORT)],
         cwd=os.path.dirname(os.path.dirname(__file__)),
         env=env,
         stdout=subprocess.DEVNULL,

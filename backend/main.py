@@ -217,7 +217,15 @@ def get_problems(search: str = "", grade: int = 0, topic: str = "", page: int = 
     if grade:
         items = [p for p in items if p.get("grade") == grade]
     if topic:
-        items = [p for p in items if topic in p.get("topics", [])]
+        topic_aliases = {
+            "so-hoc": {"so-hoc", "nghiem-nguyen", "chia-het", "so-nguyen-to", "dong-du"},
+            "dai-so": {"dai-so", "phuong-trinh", "he-phuong-trinh", "da-thuc"},
+            "hinh-hoc": {"hinh-hoc", "tam-giac-dong-dang", "tu-giac-noi-tiep", "duong-tron", "cuc-tri-hinh-hoc"},
+            "bat-dang-thuc": {"bat-dang-thuc"},
+            "to-hop": {"to-hop", "dirichlet", "nguyen-ly-cuc-han", "roi-rac"},
+        }
+        accepted = topic_aliases.get(topic, {topic})
+        items = [p for p in items if accepted.intersection(p.get("topics", []))]
     if search:
         words = content.fold_text(search).split()
         if words:
@@ -226,7 +234,10 @@ def get_problems(search: str = "", grade: int = 0, topic: str = "", page: int = 
     limit = min(max(limit, 1), 50)
     page = max(page, 1)
     start = (page - 1) * limit
-    return {"total": total, "page": page, "items": items[start:start + limit]}
+    # Keep the internal precomputed search index out of the public response.
+    page_items = items[start:start + limit]
+    public_items = [{key: value for key, value in item.items() if key != "_search"} for item in page_items]
+    return {"total": total, "page": page, "items": public_items}
 
 
 @app.get("/api/collections/{collection_id}")
@@ -241,6 +252,7 @@ def get_collection(collection_id: str, page: int = 1, per: int = 20):
     cleaned = [{k: v for k, v in p.items() if k != "_search"} for p in problems[start:start + per]]
     return {"id": item.get("id"), "title": item.get("title", ""), "grade": item.get("grade"),
             "year": item.get("year"), "kind": item.get("kind"), "province": item.get("province"),
+            "sourceName": item.get("sourceName"), "sourceUrl": item.get("sourceUrl"),
             "total": len(problems), "page": page, "per": per, "items": cleaned, "problems": cleaned}
 
 
@@ -371,9 +383,8 @@ class PasswordResetForm(BaseModel):
 
 @app.post("/api/request-reset")
 def request_reset(form: PasswordResetRequestForm):
-    # Dev mode: no email provider is configured yet, so the raw token is
-    # returned in the response body instead of being emailed to the user.
-    # Production MUST send the token by email and return only {"ok": true}.
+    # No email provider is configured. Expose the token only in explicit
+    # development mode; production responses must never disclose it.
     email = form.email.lower()
     try:
         with database.connect() as db:
@@ -401,7 +412,10 @@ def request_reset(form: PasswordResetRequestForm):
     except Exception:
         logging.exception("request reset failed")
         raise HTTPException(503, "Không tạo được yêu cầu đặt lại mật khẩu. Vui lòng thử lại.")
-    return {"ok": True, "token": token}
+    result = {"ok": True}
+    if os.getenv("PASSWORD_RESET_DEBUG", "").lower() in {"1", "true", "yes"}:
+        result["token"] = token
+    return result
 
 
 @app.post("/api/reset-password")

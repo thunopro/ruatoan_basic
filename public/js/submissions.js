@@ -71,7 +71,7 @@ form.onsubmit = async event => {
     const formData = new FormData();
     for (const file of rawFiles) {
       const blob = await compressImage(file);
-      formData.append('files', blob, file.name.replace(/\\.[^.]+$/, '') + '.webp');
+      formData.append('files', blob, file.name.replace(/\.[^.]+$/, '') + '.webp');
     }
     const response = await fetch('/api/photos', { method: 'POST', body: formData });
     let result = {};

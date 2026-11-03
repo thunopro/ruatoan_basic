@@ -109,7 +109,11 @@ async function showCollection() {
           formData.append('problem_id', problemId);
           formData.append('label', label);
           formData.append('title', title);
-          const res = await fetch('/api/photos', { method: 'POST', credentials: 'same-origin' });
+          const res = await fetch('/api/photos', {
+            method: 'POST',
+            credentials: 'same-origin',
+            body: formData
+          });
           let data = {}; try { data = await res.json(); } catch (e) {}
           if (!res.ok) throw new Error(data.detail || 'Không tải được ảnh.');
           await loadProblemPhotos(problemId, place);

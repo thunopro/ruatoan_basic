@@ -7,6 +7,13 @@ const TOPIC_META = [
   { key: 'hinh-hoc', name: 'Hình học', icon: '△', color: '#2f8cff', ti: '#062a66' },
   { key: 'to-hop', name: 'Tổ hợp', icon: 'n!', color: '#ff6a3d', ti: '#5c1a04' },
 ];
+const KIND_META = {
+  hsg: ['stamp-hsg', 'HSG'],
+  chuyen: ['stamp-chuyen', 'VÀO 10'],
+  tapchi: ['stamp-tapchi', 'TẠP CHÍ'],
+  chuyende: ['stamp-chuyende', 'CHUYÊN ĐỀ'],
+  olympic: ['stamp-olympic', 'OLYMPIC']
+};
 
 // ===================== Thống kê =====================
 async function loadStats() {
@@ -70,12 +77,15 @@ async function loadRecent() {
   try {
     const data = await api('/api/collections?limit=6');
     const items = data.items || [];
-    place.innerHTML = items.map(c => `
+    place.innerHTML = items.map(c => {
+      const [stampClass, stampText] = KIND_META[c.kind] || ['stamp-hsg', 'ĐỀ'];
+      return `
       <a class="ccard" href="/pages/exams.html?id=${encodeURIComponent(c.id)}">
-        <div class="ccard-head"><span class="stamp stamp-hsg">${escapeText(c.kind === 'hsg' ? 'HSG' : (c.kind || 'Đề').toUpperCase())}</span><span class="ccard-meta">Lớp ${escapeText(c.grade || '?')} · ${escapeText(c.year || '')}</span></div>
+        <div class="ccard-head"><span class="stamp ${stampClass}">${stampText}</span><span class="ccard-meta">Lớp ${escapeText(c.grade || '?')} · ${escapeText(c.year || '')}</span></div>
         <h3>${escapeText(c.title)}</h3>
-        <p class="muted small">${escapeText(c.itemSummary || '')} bài</p>
-      </a>`).join('');
+        <p class="muted small">${escapeText(c.itemSummary || '')}</p>
+      </a>`;
+    }).join('');
   } catch (error) {
     place.innerHTML = `<p class="empty">${escapeText(error.message)}</p>`;
   }
