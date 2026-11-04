@@ -1,14 +1,13 @@
-// submissions.js — xem, tải lên và xóa ảnh bài làm.
+// submissions.js — xem (kèm Lightbox & thông tin bài), tải lên và xóa ảnh bài làm, đổi mật khẩu.
 
 const form = document.getElementById('upload-form');
 const message = document.getElementById('message');
 const photos = document.getElementById('photos');
 const MAX_FILES = 6;
-const MAX_SIZE = 1.5 * 1024 * 1024; // 1.5MB
+const MAX_BYTES = 1_500_000; // khớp giới hạn 1.5MB của backend
 
 // ===================== Danh sách ảnh đã tải lên =====================
 async function loadPhotos() {
-  // Kiểm tra đăng nhập trước để tránh 401 console noise cho khách.
   try {
     const me = await api('/api/me');
     if (!me || !me.user) { location.href = '/pages/login.html'; return; }
@@ -16,16 +15,44 @@ async function loadPhotos() {
   try {
     const data = await api('/api/photos');
     const items = data.items || [];
+    if (!items.length) {
+      photos.innerHTML = `
+        <div class="empty" style="grid-column:1/-1">
+          ${typeof turtleSvg === 'function' ? turtleSvg('cam', 80, '', 'happy') : ''}
+          <div>
+            <h2>Bạn chưa tải ảnh bài làm nào lên</h2>
+            <p class="small muted">Chọn ảnh ở khung phía trên hoặc nộp trực tiếp tại từng bài trong trang Đề thi.</p>
+          </div>
+        </div>`;
+      return;
+    }
     photos.innerHTML = items.map(item => {
       const id = encodeURIComponent(item.id);
-      const name = escapeText(item.file_name);
+      const imgUrl = `/api/photos/${id}`;
+      const name = escapeText(item.file_name || 'Ảnh bài làm');
+      const titleInfo = [item.label, item.title].filter(Boolean).join(' · ') || item.file_name || 'Ảnh bài làm';
+      const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString('vi-VN') : '';
       return `
-      <div class="thumb">
-        <span class="thumb-img"><img src="/api/photos/${id}" alt="Ảnh bài làm: ${name}" loading="lazy"></span>
-        <button class="thumb-del" data-id="${escapeText(String(item.id))}" type="button" aria-label="Xóa ảnh ${name}" title="Xóa ảnh">×</button>
+      <div class="thumb-card">
+        <div class="thumb">
+          <a href="${imgUrl}" class="thumb-img" data-lightbox="${imgUrl}" data-caption="${escapeText(titleInfo)}">
+            <img src="${imgUrl}" alt="Ảnh bài làm: ${name}" loading="lazy">
+          </a>
+          <button class="thumb-del" data-id="${escapeText(String(item.id))}" type="button" aria-label="Xóa ảnh ${name}" title="Xóa ảnh">×</button>
+        </div>
+        <div class="thumb-meta">
+          <strong title="${escapeText(titleInfo)}">${escapeText(item.label || name)}</strong>
+          ${item.title ? `<small title="${escapeText(item.title)}">${escapeText(item.title)}</small>` : `<small>${escapeText(dateStr)}</small>`}
+        </div>
       </div>`;
-    }).join('') || '<p class="empty" style="grid-column:1/-1">Bạn chưa tải ảnh nào lên.</p>';
-    photos.querySelectorAll('button').forEach(button => {
+    }).join('');
+    photos.querySelectorAll('[data-lightbox]').forEach(link => {
+      link.onclick = e => {
+        e.preventDefault();
+        openLightbox(link.dataset.lightbox, link.dataset.caption);
+      };
+    });
+    photos.querySelectorAll('.thumb-del').forEach(button => {
       button.onclick = () => deletePhoto(button);
     });
   } catch (error) {
@@ -33,7 +60,7 @@ async function loadPhotos() {
       location.href = '/pages/login.html';
       return;
     }
-    photos.innerHTML = `<p class="empty">${escapeText(error.message)}</p>`;
+    photos.innerHTML = `<p class="empty" style="grid-column:1/-1">${escapeText(error.message)}</p>`;
   }
 }
 
@@ -66,16 +93,18 @@ form.onsubmit = async event => {
   const submitButton = form.querySelector('button[type="submit"], button');
   if (submitButton) submitButton.disabled = true;
   try {
-    // Nén ảnh phía trình duyệt (đen trắng, tăng tương phản, thu nhỏ) giống bản gốc.
-    showMessage(message, 'Đang nén và tải ảnh lên…');
+    showMessage(message, 'Đang nén và tải ảnh lên…', true);
     const formData = new FormData();
     for (const file of rawFiles) {
       const blob = await compressImage(file);
+      if (blob.size > MAX_BYTES) {
+        throw new Error(`Ảnh "${file.name}" sau khi nén vẫn vượt quá 1.5 MB.`);
+      }
       formData.append('files', blob, file.name.replace(/\.[^.]+$/, '') + '.webp');
     }
     const response = await fetch('/api/photos', { method: 'POST', body: formData });
     let result = {};
-    try { result = await response.json(); } catch (error) { /* body không phải JSON */ }
+    try { result = await response.json(); } catch (error) {}
     if (!response.ok) throw new Error(result.detail || 'Không tải được ảnh (mã ' + response.status + ').');
     showMessage(message, 'Đã lưu ảnh vào PostgreSQL.', true);
     form.reset();

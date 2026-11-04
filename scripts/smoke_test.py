@@ -146,11 +146,39 @@ def main():
         r = requests.get(f"{BASE}/api/photos")
         check("photos 401 anon", r.status_code == 401)
 
-        # 6. logout
+        # 8. logout
         r = s.post(f"{BASE}/api/logout")
         check("logout", r.status_code == 200)
         r = s.get(f"{BASE}/api/me")
         check("me after logout", r.status_code == 200 and r.json().get("user") is None)
+
+        # 9. diacritic-insensitive search across all content endpoints
+        r = requests.get(f"{BASE}/api/collections?search=Ha+Noi&limit=5")
+        check("collections accent search", r.status_code == 200 and r.json().get("total", 0) > 0, r.text)
+        coll_items = r.json().get("items", []) if r.status_code == 200 else []
+        if coll_items:
+            cid = coll_items[0]["id"]
+            r_detail = requests.get(f"{BASE}/api/collections/{cid}")
+            check("collection detail", r_detail.status_code == 200 and "problems" in r_detail.json() and "sourceName" in r_detail.json())
+
+        r = requests.get(f"{BASE}/api/problems?topic=so-hoc&search=nguyen+to&limit=5")
+        prob_json = r.json() if r.status_code == 200 else {}
+        prob_items = prob_json.get("items", [])
+        check("problems topic+accent search", r.status_code == 200 and prob_json.get("total", 0) > 0 and all("_search" not in p for p in prob_items))
+
+        r = requests.get(f"{BASE}/api/lessons?search=bat+dang+thuc")
+        check("lessons accent search", r.status_code == 200 and len(r.json().get("items", [])) > 0)
+
+        r = requests.get(f"{BASE}/api/books?search=hinh+hoc")
+        check("books accent search", r.status_code == 200 and len(r.json().get("items", [])) > 0)
+
+        r = requests.get(f"{BASE}/api/docs?search=toan")
+        check("docs accent search", r.status_code == 200 and len(r.json().get("items", [])) > 0)
+
+        # 10. all HTML page routes return 200
+        for page in ("practice", "exams", "lesson", "library", "login", "register", "submissions"):
+            rp = requests.get(f"{BASE}/pages/{page}.html")
+            check(f"page /pages/{page}.html 200", rp.status_code == 200)
 
         if failures:
             print(f"\n{len(failures)} failure(s):")
@@ -164,6 +192,17 @@ def main():
             proc.wait(timeout=10)
         except subprocess.TimeoutExpired:
             proc.kill()
+        # Clean up temporary smoke test users from PostgreSQL
+        db_url = env.get("DATABASE_URL")
+        if db_url:
+            try:
+                import psycopg
+                with psycopg.connect(db_url, autocommit=True) as conn:
+                    conn.execute(
+                        "DELETE FROM ruatoan_basic.users WHERE email LIKE 'smoke_%@example.com' OR email LIKE 'reset_%@example.com'"
+                    )
+            except Exception as e:
+                print(f"Warning: could not clean up test users: {e}")
 
 
 if __name__ == "__main__":

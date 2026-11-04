@@ -1,6 +1,7 @@
 """The small FastAPI backend for Rua Toan Basic."""
 import hashlib
 import logging
+import os
 import secrets
 import unicodedata
 from contextlib import asynccontextmanager
@@ -18,18 +19,9 @@ from . import auth, content, database
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
 
-# In-memory caches for the aggregate endpoints (/api/stats, /api/daily).
+# In-memory cache for the daily problem endpoint (/api/daily).
 # Parsing the ~16 MB source JSON is accepted once per instance (cold start);
-# these caches avoid recomputing the aggregations on every request.
-# Invalidation: cached entries store the identity of the data dict returned
-# by content.all_data() plus the same mtime-based cache key that content
-# itself uses; when the JSON files change (data reload) a new dict and a
-# new key are produced, so the cached entries stop matching and are
-# recomputed. Basic thread-safety: sync endpoints run in FastAPI's thread
-# pool, but module-variable reads/writes are atomic under the GIL — in the
-# worst case two threads compute the same aggregation once and both store
-# an equivalent result, which is harmless.
-_stats_cache = None  # (data_id, cache_key, stats_result)
+# this cache avoids recomputing the selection on every request.
 _daily_cache = None  # (data_id, day_ordinal, daily_result)
 
 
@@ -145,21 +137,6 @@ def get_page(page: str):
     return Response(content=content_text, media_type="text/html; charset=utf-8")
 
 
-def _compute_stats(data):
-    alias = {"phuong-trinh": "dai-so", "nghiem-nguyen": "so-hoc"}
-    topics = {"so-hoc": 0, "dai-so": 0, "bat-dang-thuc": 0, "hinh-hoc": 0, "to-hop": 0}
-    for collection in data["collections"]:
-        for problem in collection.get("problems", []):
-            for t in (problem.get("topics") or []):
-                key = alias.get(t, t)
-                if key in topics:
-                    topics[key] += 1
-    return {"collections": len(data["collections"]),
-            "problems": sum(len(x.get("problems", [])) for x in data["collections"]),
-            "lessons": len(data["lessons"]), "books": len(data["books"]), "docs": len(data["docs"]),
-            "topics": topics}
-
-
 @app.get("/api/stats")
 def get_stats():
     return content.all_data()["stats"]
@@ -191,13 +168,14 @@ def daily():
 @app.get("/api/collections")
 def get_collections(search: str = "", grade: int = 0, kind: str = "", page: int = 1, limit: int = 20):
     items = content.all_data()["collections"]
-    search = search.casefold().strip()
     if grade:
         items = [x for x in items if int(x.get("grade") or 0) == grade]
     if kind:
         items = [x for x in items if x.get("kind") == kind]
     if search:
-        items = [x for x in items if search in (str(x.get("title", "")) + " " + str(x.get("province", ""))).casefold()]
+        words = content.fold_text(search).split()
+        if words:
+            items = [x for x in items if all(w in x.get("_search", "") for w in words)]
     limit = min(max(limit, 1), 50)
     page = max(page, 1)
     page_items = items[(page - 1) * limit:page * limit]
@@ -246,7 +224,7 @@ def get_collection(collection_id: str, page: int = 1, per: int = 20):
     if not item:
         raise HTTPException(404, "Không tìm thấy đề hoặc bộ bài tập.")
     problems = item.get("problems", [])
-    per = min(max(per, 1), 50)
+    per = min(max(per, 1), 200)
     page = max(page, 1)
     start = (page - 1) * per
     cleaned = [{k: v for k, v in p.items() if k != "_search"} for p in problems[start:start + per]]

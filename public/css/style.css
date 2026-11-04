@@ -121,12 +121,16 @@
   padding: 24px;
   margin: 20px 0;
 }
-.form label {
+.form label, .auth-form label {
   display: block;
   margin: 14px 0 6px;
   font-weight: 700;
   color: var(--text);
   font-size: 14px;
+}
+.auth-form input {
+  width: 100%;
+  margin-top: 6px;
 }
 .form input[type="file"] {
   display: block;
@@ -232,9 +236,14 @@
 /* ===================== Photo / Thumbs ===================== */
 .thumbs {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 14px;
   margin-top: 16px;
+}
+.thumb-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 .thumb {
   position: relative;
@@ -249,12 +258,37 @@
   width: 100%;
   height: 100%;
   display: block;
+  cursor: zoom-in;
 }
 .thumb-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform .18s ease;
+}
+.thumb-img:hover img {
+  transform: scale(1.04);
+}
+.thumb-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 2px;
+}
+.thumb-meta strong {
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.thumb-meta small {
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .thumb-del {
   position: absolute;
@@ -280,6 +314,12 @@
   margin-top: 12px;
 }
 
+/* ===================== Expanded Lesson Card ===================== */
+.lcard.is-open {
+  grid-column: 1 / -1;
+  transform: none !important;
+}
+
 /* ===================== Messages & Alerts ===================== */
 .message {
   padding: 12px 16px;
@@ -301,18 +341,20 @@
 }
 .empty {
   color: var(--muted);
-  font-style: italic;
   padding: 20px 0;
   text-align: center;
 }
+.empty h2, .empty p {
+  text-align: left;
+  font-style: normal;
+}
 
-/* ===================== Responsive ===================== */
+/* ===================== Responsive & Final Polish ===================== */
 @media (max-width: 640px) {
   .filters { flex-direction: column; align-items: stretch; }
   .filters select, .filters input, .filters button { flex: 1 1 auto; width: 100%; }
 }
 
-/* Final polish layered over the original playful visual system. */
 html { scroll-behavior: smooth; }
 body { line-height: 1.65; }
 a { text-underline-offset: 3px; }
@@ -328,8 +370,8 @@ textarea:focus-visible { outline: 3px solid var(--ooze); outline-offset: 3px; }
 .form input:not([type="file"]), .form textarea, .form select { width: 100%; margin-top: 5px; }
 .form input[type="file"] { max-width: 100%; }
 .auth-card { backdrop-filter: blur(8px); }
-.empty { border: 1px dashed #6a886f; border-radius: 12px; padding: 22px; }
-.question-text { line-height: 1.9; }
+.empty { border: 2px dashed #6a886f; border-radius: 14px; padding: 22px; justify-content: center; }
+.question-text { line-height: 1.85; color: #1f1a10; }
 .pager { gap: 10px; flex-wrap: wrap; }
 @media (max-width: 760px) {
   .top-in { flex-wrap: wrap; gap: 4px 10px; }
@@ -337,8 +379,6 @@ textarea:focus-visible { outline: 3px solid var(--ooze); outline-offset: 3px; }
   .nav { order: 3; flex: 1 0 100%; justify-content: flex-start; padding-bottom: 8px; }
   #account-link { margin-left: auto; }
   main { padding-top: 26px; }
-  .hero { min-height: unset; grid-template-columns: 1fr; }
-  .hero-art { position: absolute; right: 8px; bottom: 4px; opacity: .24; pointer-events: none; }
 }
 @media (max-width: 480px) {
   .top-in { padding-inline: 12px; }

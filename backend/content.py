@@ -65,6 +65,7 @@ def _all_data_cached(cache_key):
         copy["problems"] = []
         title = str(item.get("title", ""))
         province = str(item.get("province", ""))
+        copy["_search"] = fold_text(f"{title} {province} {item.get('kind', '')} {item.get('year', '')}")
         for problem in item.get("problems", []):
             if isinstance(problem, dict) and problem.get("id") and problem["id"] not in seen_problems:
                 seen_problems.add(problem["id"])
@@ -162,9 +163,12 @@ def read_array(file):
 
 
 def filter_text(items, search, fields):
-    search = search.casefold().strip()
-    if search:
-        items = [item for item in items if any(search in str(item.get(field, "")).casefold() for field in fields)]
+    words = fold_text(search).split()
+    if words:
+        items = [
+            item for item in items
+            if all(w in fold_text(" ".join(str(item.get(field, "")) for field in fields)) for w in words)
+        ]
     return items
 
 

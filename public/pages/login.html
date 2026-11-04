@@ -8,21 +8,66 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230d1a0f'/%3E%3Cellipse cx='32' cy='33' rx='25' ry='23' fill='%237b5a2c' stroke='%23b6ff3b' stroke-width='3'/%3E%3Cpath d='M32 17l9 5v10l-9 5-9-5V22z' fill='%235cc85a' stroke='%230d1a0f' stroke-width='2.5'/%3E%3Cpath d='M32 37v9M23 32l-9 5M41 32l9 5M23 22l-8-5M41 22l8-5M32 17v-5M8 27h48v8H8z' stroke='%230d1a0f' stroke-width='2.5' fill='%232f8cff'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="/css/original.css">
   <link rel="stylesheet" href="/css/style.css">
-  <script defer src="/js/common.js?v=3"></script>
-  <script defer src="/js/account.js"></script>
+  <script defer src="/js/common.js?v=4"></script>
+  <script defer src="/js/account.js?v=4"></script>
 </head>
 <body>
   <header id="site-header"></header>
-  <main class="container narrow">
-    <h1>Đăng nhập</h1>
-    <form id="account-form" class="form">
-      <label>Email<input type="email" name="email" required></label>
-      <label>Mật khẩu<input type="password" name="password" minlength="8" required></label>
-      <button class="btn primary">Đăng nhập</button>
-      <p id="message"></p>
-    </form>
-    <p>Chưa có tài khoản? <a href="/pages/register.html">Đăng ký</a></p>
+  <main id="main">
+    <section class="auth-page" aria-labelledby="auth-title">
+      <div class="auth-card">
+        <div class="auth-brand-mark" aria-hidden="true">🐢</div>
+        <p class="auth-eyebrow">RÙA TOÁN · CỘNG ĐỒNG HỌC TOÁN</p>
+        <h1 id="auth-title">Chào mừng trở lại</h1>
+        <p class="auth-intro">Đăng nhập để lưu ảnh bài làm và tiếp tục hành trình chinh phục toán học của bạn.</p>
+
+        <nav class="auth-tabs" aria-label="Tài khoản">
+          <a href="/pages/login.html" class="active" aria-current="page">Đăng nhập</a>
+          <a href="/pages/register.html">Đăng ký</a>
+        </nav>
+
+        <form id="account-form" class="auth-form">
+          <label>Email
+            <input type="email" name="email" placeholder="ban@example.com" autocomplete="email" required>
+          </label>
+          <label>Mật khẩu
+            <input type="password" name="password" minlength="8" placeholder="Ít nhất 8 ký tự" autocomplete="current-password" required>
+          </label>
+          <button class="btn primary big" type="submit" style="width:100%;margin-top:16px">Đăng nhập</button>
+          <p id="message" hidden role="status"></p>
+        </form>
+
+        <div class="auth-footnote">
+          <p style="margin:0 0 8px">Chưa có tài khoản? <a href="/pages/register.html">Đăng ký ngay</a> · <a href="#" id="toggle-reset">Quên mật khẩu?</a></p>
+        </div>
+
+        <div id="reset-panel" hidden style="margin-top:16px;padding-top:16px;border-top:2px dashed var(--ink)">
+          <h2 style="font-size:16px;margin:0 0 10px;color:#fff;font-family:var(--display)">Đặt lại mật khẩu</h2>
+          <form id="request-reset-form" class="auth-form">
+            <label>Nhập email đã đăng ký
+              <input type="email" name="email" placeholder="ban@example.com" required>
+            </label>
+            <button class="btn sm secondary" type="submit" style="margin-top:10px">Tạo mã đặt lại mật khẩu</button>
+          </form>
+          <form id="confirm-reset-form" class="auth-form" style="margin-top:12px">
+            <label>Mã xác nhận (Token)
+              <input type="text" name="token" id="reset-token-input" placeholder="Nhập mã đặt lại mật khẩu" required>
+            </label>
+            <label>Mật khẩu mới (ít nhất 8 ký tự)
+              <input type="password" name="new_password" minlength="8" required>
+            </label>
+            <button class="btn sm primary" type="submit" style="margin-top:10px">Cập nhật mật khẩu mới</button>
+          </form>
+          <p id="reset-message" hidden role="status"></p>
+        </div>
+      </div>
+      <p class="auth-back"><a href="/">← Quay lại trang chủ Rùa Toán</a></p>
+    </section>
   </main>
-  <footer>Rùa Toán Basic</footer>
+  <footer class="foot">
+    <div class="foot-in">
+      <p class="small"><b>Rùa Toán</b> · Mật khẩu được băm PBKDF2 an toàn và phiên đăng nhập bảo vệ bằng cookie HttpOnly.</p>
+    </div>
+  </footer>
 </body>
 </html>
