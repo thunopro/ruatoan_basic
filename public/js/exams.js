@@ -275,7 +275,10 @@ async function loadProblemPhotos(problemId, root) {
   if (!grid) return;
   try {
     const res = await fetch('/api/photos?problem=' + encodeURIComponent(problemId), { credentials: 'same-origin' });
-    if (res.status === 401 || !res.ok) return;
+    if (res.status === 401 || !res.ok) {
+      grid.innerHTML = '';
+      return;
+    }
     const data = await res.json();
     const items = data.items || [];
     if (card) card.classList.toggle('is-done', items.length > 0);
