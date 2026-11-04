@@ -1,11 +1,13 @@
 {
-  "functions": {
-    "main.py": {
-      "includeFiles": "data/**",
-      "maxDuration": 30
+  "version": 2,
+  "builds": [
+    {
+      "src": "main.py",
+      "use": "@vercel/python",
+      "config": { "includeFiles": "data/**", "maxDuration": 30 }
     }
-  },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/main.py" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "main.py" }
   ]
 }
