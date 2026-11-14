@@ -2,7 +2,7 @@
 
 Rùa Toán Basic là website học Toán dành cho học sinh THCS, giúp các em ôn tập và rèn luyện theo cách chủ động, có hệ thống.
 
-## Mục tiêu hỗ trợ ngữi học
+## Mục tiêu hỗ trợ người học
 
 - **Trang chủ**: cập nhật thống kê học tập và gợi ý nội dung phù hợp.
 - **Kho đề và câu hỏi**: luyện tập từng bài và làm đề thi theo nhiều mức độ.
